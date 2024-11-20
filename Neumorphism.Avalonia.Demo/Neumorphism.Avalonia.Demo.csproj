@@ -1,0 +1,95 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- if you want to check exceptions, change this to "Exe" and start your app from the console -->
+    <OutputType Condition="'$(Configuration.toUpper())' != 'DEBUG'">WinExe</OutputType>
+    <OutputType Condition="'$(Configuration.toUpper())' == 'DEBUG'">WinExe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ApplicationIcon>Assets/app.ico</ApplicationIcon>
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <Nullable>disable</Nullable>
+    <PublishAot>true</PublishAot>
+    <SuppressTrimAnalysisWarnings>true</SuppressTrimAnalysisWarnings>
+    <PublishTrimmed>true</PublishTrimmed>
+    <TrimMode>full</TrimMode>
+    <BuiltInComInteropSupport>false</BuiltInComInteropSupport>
+    <SelfContained>true</SelfContained>
+    <AvaloniaNameGenerator>false</AvaloniaNameGenerator>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <LangVersion>default</LangVersion>
+
+	<!--Hardcore optims-->
+    <!--<UseSystemResourceKeys>true</UseSystemResourceKeys>
+    <IlcOptimizationPreference>Size</IlcOptimizationPreference>
+    <IlcGenerateStackTraceData>false</IlcGenerateStackTraceData>
+    <DebuggerSupport>false</DebuggerSupport>
+    <EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
+    <EventSourceSupport>false</EventSourceSupport>
+    <HttpActivityPropagationSupport>false</HttpActivityPropagationSupport>
+    <MetadataUpdaterSupport>false</MetadataUpdaterSupport>-->
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <IsWindows Condition="$([MSBuild]::IsOSPlatform('Windows'))">true</IsWindows>
+    <IsLinux Condition="$([MSBuild]::IsOSPlatform('Linux'))">true</IsLinux>
+    <IsOSX Condition="$([MSBuild]::IsOSPlatform('OSX'))">true</IsOSX>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <TrimMode>link</TrimMode>
+    <!--These can help when debugging weird exceptions especially when reflection is involved. See https://github.com/dotnet/corert/blob/master/Documentation/using-corert/optimizing-corert.md -->  
+    <!--RootAllApplicationAssemblies: False -> TrimMode:link See https://github.com/dotnet/runtimelab/issues/597 and https://github.com/dotnet/runtimelab/blob/feature/NativeAOT/docs/using-nativeaot/optimizing.md -->
+    <IlcGenerateCompleteTypeMetadata>false</IlcGenerateCompleteTypeMetadata>
+    <IlcGenerateStackTraceData Condition="'$(Configuration.toUpper())' != 'DEBUG'">false</IlcGenerateStackTraceData>
+    <IlcDisableUnhandledExceptionExperience>true</IlcDisableUnhandledExceptionExperience>
+    <StripSymbols Condition="'$(Configuration.toUpper())' != 'DEBUG'">true</StripSymbols>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <AvaloniaResource Include="Assets/**" />
+    <AvaloniaResource Include="Images/**" />
+    <AdditionalFiles Remove="Pages\SnackbarsDemo.axaml" />
+    <AvaloniaXaml Remove="Pages\TogglesDemo - Copier.axaml" />
+    <AvaloniaResource Include="NeumorphismXamlDisplay.axaml" />	  
+    <None Update="Assets/app.icns" CopyToPublishDirectory="PreserveNewest" Condition="$(RuntimeIdentifier.StartsWith('osx'))">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <RuntimeHostConfigurationOption Include="Switch.System.Reflection.Assembly.SimulatedCallingAssembly" Value="true" />
+  </ItemGroup>
+    
+  <ItemGroup>
+    <AvaloniaXaml Update="Pages\SnackbarsDemo.axaml">
+      <SubType>Designer</SubType>
+    </AvaloniaXaml>
+  </ItemGroup>
+    
+  <ItemGroup>
+    <Compile Update="Pages\TogglesDemo - Copier.axaml.cs">
+      <DependentUpon>%(Filename)</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+    
+
+    
+
+ 	
+  <!-- Information for Dotnet.Bundle to Generate macOS app-->
+  <PropertyGroup>
+    <CFBundleName>$(AssemblyName)</CFBundleName>
+    <CFBundleDisplayName>$(AssemblyName)</CFBundleDisplayName>
+    <CFBundleIdentifier>com.$(username).$(AssemblyName)</CFBundleIdentifier>
+    <CFBundleVersion>1.0.0</CFBundleVersion>
+    <CFBundlePackageType>APPL</CFBundlePackageType>
+    <!--<CFBundleSignature>????</CFBundleSignature>-->
+    <CFBundleExecutable>$(AssemblyName)</CFBundleExecutable>
+    <CFBundleIconFile>Assets/app.icns</CFBundleIconFile>
+    <NSPrincipalClass>NSApplication</NSPrincipalClass>
+    <NSHighResolutionCapable>true</NSHighResolutionCapable>
+    <CFBundleShortVersionString>1.0</CFBundleShortVersionString>
+    <!-- Optional -->
+    <NSRequiresAquaSystemAppearance>true</NSRequiresAquaSystemAppearance>
+    <StartupObject>Neumorphism.Avalonia.Demo.Program</StartupObject>
+  </PropertyGroup>
+
+</Project>
